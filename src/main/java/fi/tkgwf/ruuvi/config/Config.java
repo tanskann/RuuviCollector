@@ -295,7 +295,13 @@ public abstract class Config {
         return propertiesFileName -> {
             try {
                 final File jarLocation = new File(Config.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParentFile();
-                Optional<File> configFile = findConfigFile(propertiesFileName, jarLocation);
+                final String configLocationFromEnv = System.getenv("CONFIG_PATH");
+                Optional<File> configFile;
+                if(configLocationFromEnv != null) {
+                    configFile = findConfigFile(propertiesFileName, new File(configLocationFromEnv));
+                } else {
+                    configFile = findConfigFile(propertiesFileName, jarLocation);
+                }
                 if (!configFile.isPresent()) {
                     // look for config files in the parent directory if none found in the current directory, this is useful during development when
                     // RuuviCollector can be run from maven target directory directly while the config file sits in the project root
